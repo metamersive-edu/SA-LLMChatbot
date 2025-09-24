@@ -1,22 +1,40 @@
-# Node.js dependencies
-/node_modules
+# Dependencies
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
 # Logs
-logs
+logs/
 *.log
 *.log.*
 
-# Environment variables
+# Env
 .env
+.env.*.local
 
-# System files
+# OS junk
 .DS_Store
 Thumbs.db
 
-# Optional: build artifacts
-/dist
-/build
+# Caches
+.cache/
+.parcel-cache/
+.tmp/
+tmp/
+
+# Tests / Coverage
+coverage/
+.nyc_output/
+
+# Build artifacts
+dist/
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Editors
+.vscode/
+.idea/
