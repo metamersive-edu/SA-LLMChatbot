@@ -23,34 +23,15 @@
   th, td { padding:12px; text-align:left; border-bottom:1px solid #1f2937; }
   th { background:#1f2937; }
 
-  /* --- New responsive styles for horizontal iPad view --- */
-  .container-flex {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    height: calc(100vh - 72px); /* Adjust height to fit viewport */
-  }
+  .container-flex { display:flex; flex-direction:column; gap:20px; height:calc(100vh - 72px); }
 
-  /* Target horizontal orientation and tablets */
   @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
     body { padding: 0 20px; }
-    .container-flex {
-      flex-direction: row;
-      flex-wrap: nowrap;
-      height: calc(100vh - 72px);
-      padding: 0;
-    }
-    .column {
-      flex: 1;
-      min-width: 0; /* Prevents overflow */
-      overflow-y: auto; /* Make columns independently scrollable */
-      padding: 0 10px;
-      -webkit-overflow-scrolling: touch;
-      height: 100%;
-    }
-    .middle-column { flex: 1.5; } /* Make the main column slightly wider */
-    .card { margin-bottom: 20px; }
-    .wrap { max-width: 100%; padding: 0; }
+    .container-flex { flex-direction:row; flex-wrap:nowrap; height:calc(100vh - 72px); padding:0; }
+    .column { flex:1; min-width:0; overflow-y:auto; padding:0 10px; -webkit-overflow-scrolling:touch; height:100%; }
+    .middle-column { flex:1.5; }
+    .card { margin-bottom:20px; }
+    .wrap { max-width:100%; padding:0; }
   }
 </style>
 </head>
@@ -67,7 +48,7 @@
       <section class="card">
         <label>Sample Data (HKIA)</label>
         <p style="color:#94a3b8; font-size:14px; margin-top:0;">You can use this data to test your prompts in the chat above.</p>
-        
+
         <label style="margin-top:12px;">Flight Data</label>
         <table id="flights-table">
           <thead>
@@ -79,8 +60,7 @@
               <th>Time</th>
             </tr>
           </thead>
-          <tbody>
-            </tbody>
+          <tbody></tbody>
         </table>
       </section>
     </div>
@@ -110,49 +90,29 @@
     </div>
 
     <div class="column right-column">
-        <section class="card">
-          <label>Restroom Data</label>
-          <table id="restrooms-table">
-            <thead>
-              <tr>
-                <th>Location</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              </tbody>
-          </table>
-        </section>
+      <section class="card">
+        <label>Restroom Data</label>
+        <table id="restrooms-table">
+          <thead><tr><th>Location</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-        <section class="card">
-          <label>Cafe & Restaurant Data</label>
-          <table id="cafes-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Gate</th>
-                <th>Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              </tbody>
-          </table>
-        </section>
+      <section class="card">
+        <label>Cafe & Restaurant Data</label>
+        <table id="cafes-table">
+          <thead><tr><th>Name</th><th>Gate</th><th>Type</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-        <section class="card">
-          <label>Shopping Data</label>
-          <table id="shopping-table">
-            <thead>
-              <tr>
-                <th>Store</th>
-                <th>Category</th>
-                <th>Gate</th>
-              </tr>
-            </thead>
-            <tbody>
-              </tbody>
-          </table>
-        </section>
+      <section class="card">
+        <label>Shopping Data</label>
+        <table id="shopping-table">
+          <thead><tr><th>Store</th><th>Category</th><th>Gate</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
     </div>
   </div>
 
@@ -163,27 +123,26 @@ const hkAirportData = {
     { flight: 'CA105', airline: 'Air China', destination: 'Beijing', gate: '22', time: '15:45' },
     { flight: 'HK828', airline: 'Hong Kong Airlines', destination: 'Bangkok', gate: '18', time: '16:00' },
     { flight: 'KA243', airline: 'Cathay Dragon', destination: 'Taipei', gate: '33', time: '17:15' },
-    { flight: 'MU789', airline: 'China Eastern', destination: 'Shanghai', gate: '51', time: '18:00' },
+    { flight: 'MU789', airline: 'China Eastern', destination: 'Shanghai', gate: '51', time: '18:00' }
   ],
   restrooms: [
     { location: 'Gate 1-10', status: 'Clean' },
     { location: 'Gate 21-30', status: 'In Use' },
     { location: 'Gate 41-50', status: 'Clean' },
-    { location: 'Arrivals Hall', status: 'Clean' },
+    { location: 'Arrivals Hall', status: 'Clean' }
   ],
   cafes: [
     { name: 'Starbucks', gate: '15', type: 'Coffee Shop' },
     { name: 'Pret A Manger', gate: '28', type: 'Deli' },
-    { name: 'KFC', gate: '42', type: 'Fast Food' },
+    { name: 'KFC', gate: '42', type: 'Fast Food' }
   ],
   shopping: [
     { store: 'DFS Duty Free', category: 'Luxury Goods', gate: '30' },
     { store: 'Bookazine', category: 'Books & Magazines', gate: '19' },
-    { store: 'Mannings', category: 'Health & Beauty', gate: '48' },
+    { store: 'Mannings', category: 'Health & Beauty', gate: '48' }
   ]
 };
 
-const API_BASE = 'http://localhost:3000';
 const askBtn = document.getElementById('askBtn');
 const clearBtn = document.getElementById('clearBtn');
 const statusEl = document.getElementById('status');
@@ -193,32 +152,31 @@ const restroomsTableBody = document.querySelector('#restrooms-table tbody');
 const cafesTableBody = document.querySelector('#cafes-table tbody');
 const shoppingTableBody = document.querySelector('#shopping-table tbody');
 
+// same-origin base (works locally and on Render)
+const API_BASE = ''; // <-- IMPORTANT: no localhost!
+
 function displaySampleData() {
-    hkAirportData.flights.forEach(flight => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${flight.flight}</td><td>${flight.airline}</td><td>${flight.destination}</td><td>${flight.gate}</td><td>${flight.time}</td>`;
-        flightsTableBody.appendChild(row);
-    });
-
-    hkAirportData.restrooms.forEach(restroom => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${restroom.location}</td><td style="color:${restroom.status === 'Clean' ? '#00e000' : 'yellow'};">${restroom.status}</td>`;
-        restroomsTableBody.appendChild(row);
-    });
-
-    hkAirportData.cafes.forEach(cafe => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${cafe.name}</td><td>${cafe.gate}</td><td>${cafe.type}</td>`;
-        cafesTableBody.appendChild(row);
-    });
-    
-    hkAirportData.shopping.forEach(store => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${store.store}</td><td>${store.category}</td><td>${store.gate}</td>`;
-        shoppingTableBody.appendChild(row);
-    });
+  hkAirportData.flights.forEach(f => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${f.flight}</td><td>${f.airline}</td><td>${f.destination}</td><td>${f.gate}</td><td>${f.time}</td>`;
+    flightsTableBody.appendChild(tr);
+  });
+  hkAirportData.restrooms.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.location}</td><td style="color:${r.status === 'Clean' ? '#00e000' : 'yellow'}">${r.status}</td>`;
+    restroomsTableBody.appendChild(tr);
+  });
+  hkAirportData.cafes.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.name}</td><td>${c.gate}</td><td>${c.type}</td>`;
+    cafesTableBody.appendChild(tr);
+  });
+  hkAirportData.shopping.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.store}</td><td>${s.category}</td><td>${s.gate}</td>`;
+    shoppingTableBody.appendChild(tr);
+  });
 }
-
 document.addEventListener('DOMContentLoaded', displaySampleData);
 
 function setBusy(b) { askBtn.disabled = b; statusEl.textContent = b ? 'Thinking…' : ''; }
@@ -236,11 +194,9 @@ askBtn.addEventListener('click', async () => {
   const sampleDataString = JSON.stringify(hkAirportData, null, 2);
 
   const payload = {
-    // The model is no longer selected from the frontend UI
     system: document.getElementById('system').value.trim(),
-    // Combine the user's custom context with the sample data
     context: `${customContext}\n\nHere is the sample data:\n${sampleDataString}`,
-    user: document.getElementById('user').value.trim(),
+    user: document.getElementById('user').value.trim()
   };
 
   if (!payload.user) { alert('Enter a passenger question.'); return; }
