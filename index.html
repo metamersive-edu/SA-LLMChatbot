@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smart AI Website — Prompt Lab</title>
+<style>
+  :root { font-family: system-ui, Arial, sans-serif; }
+  body { margin:0; background:#0f172a; color:#e2e8f0; }
+  header { padding:16px 20px; background:#111827; border-bottom:1px solid #1f2937; }
+  h1 { margin:0; font-size:18px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 20px; }
+  .card { background:#111827; border:1px solid #1f2937; border-radius:14px; padding:16px; margin-bottom:16px; }
+  label { display:block; font-size:14px; color:#93c5fd; margin-bottom:6px; }
+  textarea, input, select { width:100%; box-sizing:border-box; background:#0b1220; color:#e5e7eb; border:1px solid #1f2937; border-radius:10px; padding:12px; }
+  textarea { min-height: 96px; resize: vertical; }
+  button { cursor:pointer; border:1px solid #1f2937; background:#2563eb; color:white; border-radius:10px; padding:10px 14px; font-weight:600; }
+  button:disabled { opacity:.6 }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .out { white-space:pre-wrap; line-height:1.5; }
+  .pill { padding:4px 8px; background:#0b1220; border:1px solid #1f2937; border-radius:999px; }
+  table { width:100%; border-collapse:collapse; margin-top:12px; }
+  th, td { padding:12px; text-align:left; border-bottom:1px solid #1f2937; }
+  th { background:#1f2937; }
+
+  /* --- New responsive styles for horizontal iPad view --- */
+  .container-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: calc(100vh - 72px); /* Adjust height to fit viewport */
+  }
+
+  /* Target horizontal orientation and tablets */
+  @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
+    body { padding: 0 20px; }
+    .container-flex {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      height: calc(100vh - 72px);
+      padding: 0;
+    }
+    .column {
+      flex: 1;
+      min-width: 0; /* Prevents overflow */
+      overflow-y: auto; /* Make columns independently scrollable */
+      padding: 0 10px;
+      -webkit-overflow-scrolling: touch;
+      height: 100%;
+    }
+    .middle-column { flex: 1.5; } /* Make the main column slightly wider */
+    .card { margin-bottom: 20px; }
+    .wrap { max-width: 100%; padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap row">
+      <h1>Smart AI Website — Prompt Lab</h1>
+      <span class="pill">Measure → Manage → Monitor</span>
+    </div>
+  </header>
+
+  <div class="container-flex wrap">
+    <div class="column left-column">
+      <section class="card">
+        <label>Sample Data (HKIA)</label>
+        <p style="color:#94a3b8; font-size:14px; margin-top:0;">You can use this data to test your prompts in the chat above.</p>
+        
+        <label style="margin-top:12px;">Flight Data</label>
+        <table id="flights-table">
+          <thead>
+            <tr>
+              <th>Flight</th>
+              <th>Airline</th>
+              <th>Destination</th>
+              <th>Gate</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            </tbody>
+        </table>
+      </section>
+    </div>
+
+    <div class="column middle-column">
+      <section class="card">
+        <label for="context">Context (optional)</label>
+        <input id="context" placeholder="You are the Smart Airport Info Assistant." />
+
+        <label for="system" style="margin-top:12px">Manage — Write the rule (system prompt)</label>
+        <textarea id="system" placeholder="Always answer with Flight Number, Gate, and Boarding Time."></textarea>
+
+        <label for="user" style="margin-top:12px">Passenger question</label>
+        <textarea id="user" placeholder="Where is Flight AI123 boarding?"></textarea>
+
+        <div class="row" style="margin-top:12px">
+          <button id="askBtn">Ask</button>
+          <button id="clearBtn" style="background:#334155">Clear</button>
+          <span id="status" style="color:#94a3b8"></span>
+        </div>
+      </section>
+
+      <section class="card">
+        <label>Monitor — AI Reply</label>
+        <div id="reply" class="out"></div>
+      </section>
+    </div>
+
+    <div class="column right-column">
+        <section class="card">
+          <label>Restroom Data</label>
+          <table id="restrooms-table">
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              </tbody>
+          </table>
+        </section>
+
+        <section class="card">
+          <label>Cafe & Restaurant Data</label>
+          <table id="cafes-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Gate</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              </tbody>
+          </table>
+        </section>
+
+        <section class="card">
+          <label>Shopping Data</label>
+          <table id="shopping-table">
+            <thead>
+              <tr>
+                <th>Store</th>
+                <th>Category</th>
+                <th>Gate</th>
+              </tr>
+            </thead>
+            <tbody>
+              </tbody>
+          </table>
+        </section>
+    </div>
+  </div>
+
+<script>
+const hkAirportData = {
+  flights: [
+    { flight: 'CX324', airline: 'Cathay Pacific', destination: 'London', gate: '45', time: '14:30' },
+    { flight: 'CA105', airline: 'Air China', destination: 'Beijing', gate: '22', time: '15:45' },
+    { flight: 'HK828', airline: 'Hong Kong Airlines', destination: 'Bangkok', gate: '18', time: '16:00' },
+    { flight: 'KA243', airline: 'Cathay Dragon', destination: 'Taipei', gate: '33', time: '17:15' },
+    { flight: 'MU789', airline: 'China Eastern', destination: 'Shanghai', gate: '51', time: '18:00' },
+  ],
+  restrooms: [
+    { location: 'Gate 1-10', status: 'Clean' },
+    { location: 'Gate 21-30', status: 'In Use' },
+    { location: 'Gate 41-50', status: 'Clean' },
+    { location: 'Arrivals Hall', status: 'Clean' },
+  ],
+  cafes: [
+    { name: 'Starbucks', gate: '15', type: 'Coffee Shop' },
+    { name: 'Pret A Manger', gate: '28', type: 'Deli' },
+    { name: 'KFC', gate: '42', type: 'Fast Food' },
+  ],
+  shopping: [
+    { store: 'DFS Duty Free', category: 'Luxury Goods', gate: '30' },
+    { store: 'Bookazine', category: 'Books & Magazines', gate: '19' },
+    { store: 'Mannings', category: 'Health & Beauty', gate: '48' },
+  ]
+};
+
+const API_BASE = 'http://localhost:3000';
+const askBtn = document.getElementById('askBtn');
+const clearBtn = document.getElementById('clearBtn');
+const statusEl = document.getElementById('status');
+const replyEl = document.getElementById('reply');
+const flightsTableBody = document.querySelector('#flights-table tbody');
+const restroomsTableBody = document.querySelector('#restrooms-table tbody');
+const cafesTableBody = document.querySelector('#cafes-table tbody');
+const shoppingTableBody = document.querySelector('#shopping-table tbody');
+
+function displaySampleData() {
+    hkAirportData.flights.forEach(flight => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${flight.flight}</td><td>${flight.airline}</td><td>${flight.destination}</td><td>${flight.gate}</td><td>${flight.time}</td>`;
+        flightsTableBody.appendChild(row);
+    });
+
+    hkAirportData.restrooms.forEach(restroom => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${restroom.location}</td><td style="color:${restroom.status === 'Clean' ? '#00e000' : 'yellow'};">${restroom.status}</td>`;
+        restroomsTableBody.appendChild(row);
+    });
+
+    hkAirportData.cafes.forEach(cafe => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${cafe.name}</td><td>${cafe.gate}</td><td>${cafe.type}</td>`;
+        cafesTableBody.appendChild(row);
+    });
+    
+    hkAirportData.shopping.forEach(store => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${store.store}</td><td>${store.category}</td><td>${store.gate}</td>`;
+        shoppingTableBody.appendChild(row);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', displaySampleData);
+
+function setBusy(b) { askBtn.disabled = b; statusEl.textContent = b ? 'Thinking…' : ''; }
+
+clearBtn.addEventListener('click', () => {
+  document.getElementById('system').value = '';
+  document.getElementById('user').value = '';
+  document.getElementById('context').value = '';
+  replyEl.textContent = '';
+  statusEl.textContent = '';
+});
+
+askBtn.addEventListener('click', async () => {
+  const customContext = document.getElementById('context').value.trim();
+  const sampleDataString = JSON.stringify(hkAirportData, null, 2);
+
+  const payload = {
+    // The model is no longer selected from the frontend UI
+    system: document.getElementById('system').value.trim(),
+    // Combine the user's custom context with the sample data
+    context: `${customContext}\n\nHere is the sample data:\n${sampleDataString}`,
+    user: document.getElementById('user').value.trim(),
+  };
+
+  if (!payload.user) { alert('Enter a passenger question.'); return; }
+
+  setBusy(true);
+  try {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    replyEl.textContent = data.reply || JSON.stringify(data, null, 2);
+  } catch (e) {
+    replyEl.textContent = 'Error: ' + e.message;
+  } finally {
+    setBusy(false);
+  }
+});
+</script>
+</body>
+</html>
